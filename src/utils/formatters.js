@@ -15,17 +15,21 @@ export const formatCurrency = (
   const numAmount = parseFloat(amount);
 
   if (typeof numAmount !== "number" || isNaN(numAmount)) {
-    // console.warn(`Invalid amount for currency formatting: ${amount}. Returning $0.00 as placeholder.`);
-    // Return a default formatted value for invalid inputs to avoid breaking the UI
+    console.warn(
+      `Invalid amount for currency formatting: ${amount}. Returning placeholder.`
+    );
     return new Intl.NumberFormat(locale, {
       style: "currency",
-      currency: "USD", // Always use a valid fallback currency
+      currency: currencyCode || "USD", // Use provided currency or fallback to USD
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(0);
   }
 
   try {
+    // Log for debugging
+    console.log(`Formatting ${numAmount} as ${currencyCode}`);
+
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: currencyCode,
@@ -33,14 +37,15 @@ export const formatCurrency = (
       maximumFractionDigits: 2,
     }).format(numAmount);
   } catch (error) {
-    // This catch block handles cases where the currencyCode might be invalid for Intl.NumberFormat
-    // console.warn(`Failed to format currency for ${currencyCode}, falling back to USD formatting. Error: ${error.message}`);
+    console.error(
+      `Failed to format currency for ${currencyCode}, falling back to USD. Error: ${error.message}`
+    );
     return new Intl.NumberFormat(locale, {
       style: "currency",
-      currency: "USD", // Fallback to a known valid currency like USD
+      currency: "USD", // Fallback to USD
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(numAmount); // Format the original amount but with USD
+    }).format(numAmount);
   }
 };
 

@@ -13,8 +13,21 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
   const totalPayment = emi * loanTerm;
   const totalInterest = totalPayment - loanAmount;
 
+  // Calculate converted values for all monetary amounts
   const convertedEmi = selectedCurrency !== 'USD' && !loading && !error && rates && rates[selectedCurrency]
     ? convertAmount(emi, selectedCurrency)
+    : null;
+
+  const convertedLoanAmount = selectedCurrency !== 'USD' && !loading && !error && rates && rates[selectedCurrency]
+    ? convertAmount(loanAmount, selectedCurrency)
+    : null;
+
+  const convertedTotalInterest = selectedCurrency !== 'USD' && !loading && !error && rates && rates[selectedCurrency]
+    ? convertAmount(totalInterest, selectedCurrency)
+    : null;
+
+  const convertedTotalPayment = selectedCurrency !== 'USD' && !loading && !error && rates && rates[selectedCurrency]
+    ? convertAmount(totalPayment, selectedCurrency)
     : null;
 
   return (
@@ -30,7 +43,9 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
             Loan Amount
           </Typography>
           <Typography variant="h6">
-            {formatCurrency(loanAmount, 'USD')}
+            {selectedCurrency === 'USD' || convertedLoanAmount === null
+              ? formatCurrency(loanAmount, 'USD')
+              : formatCurrency(convertedLoanAmount, selectedCurrency)}
           </Typography>
         </Grid>
 
@@ -57,7 +72,9 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
             Total Interest
           </Typography>
           <Typography variant="h6">
-            {formatCurrency(totalInterest, 'USD')}
+            {selectedCurrency === 'USD' || convertedTotalInterest === null
+              ? formatCurrency(totalInterest, 'USD')
+              : formatCurrency(convertedTotalInterest, selectedCurrency)}
           </Typography>
         </Grid>
 
@@ -69,7 +86,9 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
                 Monthly Payment (EMI)
               </Typography>
               <Typography variant="h4" color="primary" sx={{ fontWeight: 'bold' }}>
-                {formatCurrency(emi, 'USD')}
+                {selectedCurrency === 'USD' || convertedEmi === null
+                  ? formatCurrency(emi, 'USD')
+                  : formatCurrency(convertedEmi, selectedCurrency)}
               </Typography>
             </Box>
 
@@ -84,7 +103,7 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
                   <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                     Could not convert: {error}
                   </Typography>
-                ) : convertedEmi !== null && rates && rates[selectedCurrency] ? (
+                ) : convertedEmi !== null ? (
                   <Typography variant="h5" color="secondary" sx={{ fontWeight: 'bold' }}>
                     {formatCurrency(convertedEmi, selectedCurrency)}
                   </Typography>
@@ -104,7 +123,9 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
             Total Payment
           </Typography>
           <Typography variant="h5">
-            {formatCurrency(totalPayment, 'USD')}
+            {selectedCurrency === 'USD' || convertedTotalPayment === null
+              ? formatCurrency(totalPayment, 'USD')
+              : formatCurrency(convertedTotalPayment, selectedCurrency)}
           </Typography>
         </Grid>
       </Grid>
