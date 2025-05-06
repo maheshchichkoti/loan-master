@@ -76,7 +76,7 @@ const Header = () => {
       <Toolbar>
         <CalculateIcon sx={{ mr: 1 }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Loan Calculator
+          Loan Master
         </Typography>
 
         {isMobile ? (

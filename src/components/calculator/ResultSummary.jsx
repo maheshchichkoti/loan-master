@@ -30,6 +30,15 @@ const ResultSummary = ({ loanAmount, interestRate, loanTerm, emi }) => {
     ? convertAmount(totalPayment, selectedCurrency)
     : null;
 
+  // Helper function to format currency with the correct code
+  const formatWithCurrency = (amount, isConverted) => {
+    if (selectedCurrency === 'USD' || !isConverted) {
+      return formatCurrency(amount, 'USD');
+    } else {
+      return formatCurrency(amount, selectedCurrency);
+    }
+  };
+
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
       <Typography variant="h5" gutterBottom>

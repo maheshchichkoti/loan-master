@@ -1,5 +1,5 @@
 // src/components/calculator/AmortizationTable.jsx
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import {
   Paper,
   Typography,
@@ -13,10 +13,15 @@ import {
   Divider
 } from '@mui/material';
 import { useAmortizationSchedule } from '../../hooks/useAmortizationSchedule';
+import { CurrencyContext } from '../../context/CurrencyContext';
+import { useExchangeRates } from '../../hooks/useExchangeRates';
+import { formatCurrency } from '../../utils/formatters';
 
 const AmortizationTable = ({ loanAmount, interestRate, loanTerm, emi }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { selectedCurrency } = useContext(CurrencyContext);
+  const { rates, convertAmount } = useExchangeRates('USD');
 
   const schedule = useAmortizationSchedule(loanAmount, interestRate, loanTerm, emi);
 
@@ -29,13 +34,14 @@ const AmortizationTable = ({ loanAmount, interestRate, loanTerm, emi }) => {
     setPage(0);
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
+  // Format currency based on selected currency
+  const formatTableCurrency = (amount) => {
+    if (selectedCurrency === 'USD' || !rates || !rates[selectedCurrency]) {
+      return formatCurrency(amount, 'USD');
+    } else {
+      const converted = convertAmount(amount, selectedCurrency);
+      return formatCurrency(converted, selectedCurrency);
+    }
   };
 
   return (
@@ -64,10 +70,10 @@ const AmortizationTable = ({ loanAmount, interestRate, loanTerm, emi }) => {
                   <TableCell component="th" scope="row">
                     {row.month}
                   </TableCell>
-                  <TableCell align="right">{formatCurrency(row.emi)}</TableCell>
-                  <TableCell align="right">{formatCurrency(row.principal)}</TableCell>
-                  <TableCell align="right">{formatCurrency(row.interest)}</TableCell>
-                  <TableCell align="right">{formatCurrency(row.balance)}</TableCell>
+                  <TableCell align="right">{formatTableCurrency(row.emi)}</TableCell>
+                  <TableCell align="right">{formatTableCurrency(row.principal)}</TableCell>
+                  <TableCell align="right">{formatTableCurrency(row.interest)}</TableCell>
+                  <TableCell align="right">{formatTableCurrency(row.balance)}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
